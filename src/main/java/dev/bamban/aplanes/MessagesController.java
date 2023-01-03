@@ -1,7 +1,8 @@
 package dev.bamban.aplanes;
 
-import dev.bamban.aplanes.messages.processors.CpdlcMessageProcessor;
-import dev.bamban.aplanes.messages.processors.InfoReqMessageProcessor;
+import dev.bamban.aplanes.messages.handlers.CpdlcMessageConsumer;
+import dev.bamban.aplanes.messages.handlers.InfoReqMessageConsumer;
+import dev.bamban.aplanes.messages.handlers.MessageHandler;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.async.DeferredResult;
 
@@ -26,9 +27,9 @@ public class MessagesController {
         this.messageRepository = messageRepository;
 
         this.messageHandler = new MessageHandler();
-        messageHandler.register(MessageType.INFOREQ, new InfoReqMessageProcessor(messageRepository));
-        messageHandler.register(MessageType.CPDLC, new CpdlcMessageProcessor(messageRepository));
-        messageHandler.register(MessageType.TELEX, new CpdlcMessageProcessor(messageRepository));
+        messageHandler.register(MessageType.INFOREQ, new InfoReqMessageConsumer(messageRepository));
+        messageHandler.register(MessageType.CPDLC, new CpdlcMessageConsumer(messageRepository));
+        messageHandler.register(MessageType.TELEX, new CpdlcMessageConsumer(messageRepository));
     }
 
     @GetMapping
@@ -67,7 +68,7 @@ public class MessagesController {
 
     @PostMapping
     public Message sendMessage(@RequestBody Message message) {
-        messageHandler.process(message);
+        messageHandler.accept(message);
         return message;
     }
 }

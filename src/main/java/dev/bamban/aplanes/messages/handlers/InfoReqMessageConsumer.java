@@ -1,4 +1,4 @@
-package dev.bamban.aplanes.messages.processors;
+package dev.bamban.aplanes.messages.handlers;
 
 import dev.bamban.aplanes.Message;
 import dev.bamban.aplanes.MessageRepository;
@@ -7,19 +7,20 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
-public class InfoReqMessageProcessor implements MessageProcessor {
+public class InfoReqMessageConsumer implements Consumer<Message> {
     private static final Pattern messagePattern = Pattern.compile("^(metar|shorttaf|taf|vatatis)\\s+(\\w+)$", Pattern.CASE_INSENSITIVE);
     private static final HttpClient httpClient = HttpClient.newHttpClient();
     private final MessageRepository messageRepository;
 
-    public InfoReqMessageProcessor(MessageRepository messageRepository) {
+    public InfoReqMessageConsumer(MessageRepository messageRepository) {
         this.messageRepository = messageRepository;
     }
 
     @Override
-    public void process(Message message) {
+    public void accept(Message message) {
         var m = messagePattern.matcher(message.getContent());
 
         if (!m.find()) {
